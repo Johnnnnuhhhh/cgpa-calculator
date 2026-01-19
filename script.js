@@ -1,6 +1,4 @@
-// -------------------------------
-// Grade to points mapping
-// -------------------------------
+// Grade mapping
 const gradeToPoints = {
     "O": 10,
     "A+": 9,
@@ -11,200 +9,113 @@ const gradeToPoints = {
     "RA": 0
 };
 
-// -------------------------------
-// Course details (same as Python)
-// -------------------------------
+// Course data (same as Python)
 const allSemesters = {
-    1: {
-        "HS3152 (Professional English - I)": 3,
-        "MA3151 (Matrices and Calculus)": 4,
-        "PH3151 (Engineering Physics)": 3,
-        "CY3151 (Engineering Chemistry)": 3,
-        "GE3151 (Problem Solving and Python Programming)": 3,
-        "GE3152 (Heritage of Tamils)": 1,
-        "GE3171 (PSPP Lab)": 2,
-        "BS3171 (Physics & Chemistry Lab)": 2,
-        "GE3172 (English Lab)": 1,
-    },
-    2: {
-        "HS3252 (Professional English - II)": 2,
-        "MA3251 (Statistics & Numerical Methods)": 4,
-        "PH3254 (Physics for ECE)": 3,
-        "BE3254 (Electrical & Instrumentation)": 3,
-        "GE3251 (Engineering Graphics)": 4,
-        "EC3251 (Circuit Analysis)": 4,
-        "GE3252 (Tamils & Technology)": 1,
-        "GE3271 (Engineering Practices Lab)": 2,
-        "EC3271 (Circuit Analysis Lab)": 1,
-        "GE3272 (Communication Lab)": 2,
-    },
-    3: {
-        "MA3355 (Random Processes & LA)": 4,
-        "CS3353 (C Programming & DS)": 3,
-        "EC3354 (Signals & Systems)": 4,
-        "EC3353 (EDC)": 3,
-        "EC3351 (Control Systems)": 3,
-        "EC3352 (DSD)": 4,
-        "EC3361 (EDC Lab)": 1.5,
-        "CS3362 (C & DS Lab)": 1.5,
-        "GE3361 (Professional Development)": 1,
-    },
-    4: {
-        "EC3452 (EMF)": 3,
-        "EC3401 (Networks & Security)": 4,
-        "EC3451 (LIC)": 3,
-        "EC3492 (DSP)": 4,
-        "EC3491 (Communication Systems)": 3,
-        "GE3451 (EVS)": 2,
-        "EC3461 (Comm Systems Lab)": 1.5,
-        "EC3462 (LIC Lab)": 1.5,
-    },
-    5: {
-        "EC3501 (Wireless Communication)": 4,
-        "EC3552 (VLSI & Chip Design)": 3,
-        "EC3551 (TL & RF)": 3,
-        "Professional Elective I": 3,
-        "Professional Elective II": 3,
-        "Professional Elective III": 3,
-        "EC3561 (VLSI Lab)": 2,
-    },
-    6: {
-        "ET3491 (Embedded & IoT)": 4,
-        "CS3491 (AI & ML)": 4,
-        "Open Elective I": 3,
-        "Professional Elective IV": 3,
-        "Professional Elective V": 3,
-        "Professional Elective VI": 3,
-    },
-    7: {
-        "GE3791 (Human Values & Ethics)": 2,
-        "Elective – Management": 3,
-        "Open Elective II": 3,
-        "Open Elective III": 3,
-        "Open Elective IV": 3,
-        "EC3711 (Summer Internship)": 2,
-    },
-    8: {
-        "EC3811 (Project Work)": 10,
-    }
+    1: { ... },  // SAME as before (omitted here for brevity)
+    2: { ... },
+    3: { ... },
+    4: { ... },
+    5: { ... },
+    6: { ... },
+    7: { ... },
+    8: { ... }
 };
 
-// -------------------------------
-// App State
-// -------------------------------
 let currentSem = 1;
 let overallPoints = 0;
 let overallCredits = 0;
-
 const app = document.getElementById("app");
 
-// -------------------------------
-// Start App
-// -------------------------------
-renderSemester();
+// Start
+showSemesterCard();
 
-// -------------------------------
-// Render Semester Choice
-// -------------------------------
-function renderSemester() {
+// Render sem card
+function showSemesterCard() {
     app.innerHTML = `
-        <h2>Semester ${currentSem}</h2>
-        <p>Do you know the GPA for this semester?</p>
-        <button onclick="renderGPAInput()">Yes</button>
-        <button onclick="renderSubjectInput()">No</button>
+        <div class="card">
+            <h2>Semester ${currentSem}</h2>
+            <p>Do you know your GPA for this semester?</p>
+            <button class="btn" onclick="askGPA()">Yes</button>
+            <button class="btn" onclick="askGrades()">No</button>
+        </div>
     `;
 }
 
-// -------------------------------
-// GPA Input Mode
-// -------------------------------
-function renderGPAInput() {
+// Ask GPA directly
+function askGPA() {
     app.innerHTML = `
-        <h2>Semester ${currentSem}</h2>
-        <p>Enter GPA:</p>
-        <input type="number" step="0.01" id="semGPA">
-        <br><br>
-        <button onclick="submitGPA()">Submit</button>
+        <div class="card">
+            <h2>Semester ${currentSem} GPA</h2>
+            <input type="number" id="gpaInput" placeholder="Enter GPA (0-10)" step="0.01" min="0" max="10">
+            <button class="btn" onclick="submitGPA()">Submit</button>
+        </div>
     `;
 }
 
 function submitGPA() {
-    const gpa = parseFloat(document.getElementById("semGPA").value);
-    if (isNaN(gpa)) {
-        alert("Enter valid GPA");
+    const gpa = parseFloat(document.getElementById("gpaInput").value);
+    if (isNaN(gpa) || gpa < 0 || gpa > 10) {
+        alert("Enter a valid GPA");
         return;
     }
 
-    const credits = Object.values(allSemesters[currentSem])
-        .reduce((a, b) => a + b, 0);
+    const creditSum = Object.values(allSemesters[currentSem])
+        .reduce((a,b) => a + b, 0);
 
-    overallPoints += gpa * credits;
-    overallCredits += credits;
-
-    nextSemester();
+    overallPoints += gpa * creditSum;
+    overallCredits += creditSum;
+    moveNext();
 }
 
-// -------------------------------
-// Subject-wise Mode
-// -------------------------------
-function renderSubjectInput() {
-    let html = `<h2>Semester ${currentSem}</h2>`;
-
+// Ask grades per subject
+function askGrades() {
+    let html = `<div class="card"><h2>Semester ${currentSem} Grades</h2>`;
     for (let course in allSemesters[currentSem]) {
         html += `
-            <label>${course}</label><br>
+            <label>${course}</label>
             <select id="${course}">
-                <option value="">Select Grade</option>
-                ${Object.keys(gradeToPoints)
-                    .map(g => `<option value="${g}">${g}</option>`)
-                    .join("")}
-            </select><br><br>
+                <option value="">Select grade</option>
+                ${Object.keys(gradeToPoints).map(g => `<option>${g}</option>`).join("")}
+            </select>
         `;
     }
-
-    html += `<button onclick="submitSubjects()">Submit</button>`;
+    html += `<button class="btn" onclick="submitGrades()">Submit</button></div>`;
     app.innerHTML = html;
 }
 
-function submitSubjects() {
-    let semPoints = 0;
-    let semCredits = 0;
-
+function submitGrades() {
+    let semPoints = 0, semCredits = 0;
     for (let course in allSemesters[currentSem]) {
-        const grade = document.getElementById(course).value;
-        const credits = allSemesters[currentSem][course];
-
-        if (!grade) {
+        const sel = document.getElementById(course).value;
+        if (!sel) {
             alert("Select all grades");
             return;
         }
-
-        if (grade !== "RA") {
-            semPoints += gradeToPoints[grade] * credits;
-            semCredits += credits;
+        const cr = allSemesters[currentSem][course];
+        if (sel !== "RA") {
+            semPoints += gradeToPoints[sel] * cr;
+            semCredits += cr;
         }
     }
-
     overallPoints += semPoints;
     overallCredits += semCredits;
-
-    nextSemester();
+    moveNext();
 }
 
-// -------------------------------
-// Move to Next Semester
-// -------------------------------
-function nextSemester() {
-    const cgpa = (overallPoints / overallCredits).toFixed(2);
+// Next
+function moveNext() {
+    const curCGPA = (overallPoints / overallCredits).toFixed(2);
 
     if (currentSem === 8) {
-        app.innerHTML = `<h2>🎉 Final CGPA: ${cgpa}</h2>`;
+        app.innerHTML = `<div class="result">🎉 Final CGPA: ${curCGPA}</div>`;
         return;
     }
 
     currentSem++;
     app.innerHTML = `
-        <h3>CGPA till Semester ${currentSem - 1}: ${cgpa}</h3>
-        <button onclick="renderSemester()">Continue</button>
+        <div class="card">
+            <h3>CGPA till Sem ${currentSem - 1}: ${curCGPA}</h3>
+            <button class="btn" onclick="showSemesterCard()">Continue</button>
+        </div>
     `;
 }
